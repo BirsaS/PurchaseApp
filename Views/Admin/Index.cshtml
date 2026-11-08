@@ -4,7 +4,7 @@
     ViewData["Title"] = "Admin Management";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="app-page-heading d-flex justify-content-between align-items-center mb-4">
     <h2>Admin - Purchase Requests Management</h2>
 
     <div class="d-flex align-items-center gap-2">
@@ -15,7 +15,7 @@
 </div>
 
 <div id="adminTableContainer" data-auto-refresh>
-    <table class="table table-striped table-hover align-middle">
+    <table class="table table-striped table-hover align-middle mobile-card-table">
         <thead>
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Title)</th>
@@ -33,16 +33,16 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.Title</td>
-                    <td class="text-nowrap">@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
-                    <td>@item.Department</td>
-                    <td>@item.ProposedSupplier</td>
-                    <td>@item.ApplicantName</td>
-                    <td>
+                    <td data-label="Title">@item.Title</td>
+                    <td class="text-nowrap" data-label="Amount">@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
+                    <td data-label="Department">@item.Department</td>
+                    <td data-label="Proposed Supplier">@item.ProposedSupplier</td>
+                    <td data-label="Applicant Name">@item.ApplicantName</td>
+                    <td data-label="Status">
                         <span class="badge request-status" data-status="@item.Status">@item.Status</span>
                     </td>
-                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>
+                    <td data-label="Created At">@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td data-label="Pur. Order Number">
                         @if (!string.IsNullOrEmpty(item.PurchaseOrderNumber))
                         {
                             <span class="badge bg-info text-dark purchase-order-number">@item.PurchaseOrderNumber</span>
@@ -56,7 +56,7 @@
                             <span class="text-muted">-</span>
                         }
                     </td>
-                    <td class="text-end">
+                    <td class="text-end" data-label="Actions">
                         <div class="d-flex gap-1 justify-content-end align-items-center">
                             @if (item.Status == "Failed")
                             {

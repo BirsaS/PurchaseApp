@@ -81,3 +81,91 @@ body {
 .purchase-order-number {
   white-space: nowrap;
 }
+
+@media (max-width: 767.98px) {
+  .app-page-heading {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .app-page-heading h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+  }
+
+  .app-page-heading > div {
+    flex-wrap: wrap;
+  }
+
+  .app-page-heading .btn {
+    min-height: 42px;
+  }
+
+  .mobile-card-table,
+  .mobile-card-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .mobile-card-table thead {
+    display: none;
+  }
+
+  .mobile-card-table tbody tr {
+    display: block;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    background: var(--bs-white);
+    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 8%);
+  }
+
+  .mobile-card-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    padding: 0.7rem 0.75rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    background: var(--bs-white) !important;
+    overflow-wrap: anywhere;
+    text-align: left !important;
+  }
+
+  .mobile-card-table tbody td::before {
+    content: attr(data-label);
+    color: var(--bs-secondary-color);
+    font-weight: 600;
+  }
+
+  .mobile-card-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-card-table td[data-label="Actions"],
+  .mobile-card-table td[data-label="Approval Actions / Status"] {
+    display: block;
+  }
+
+  .mobile-card-table td[data-label="Actions"]::before,
+  .mobile-card-table td[data-label="Approval Actions / Status"]::before {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-card-table td[data-label="Actions"] > div {
+    flex-wrap: wrap;
+    justify-content: flex-start !important;
+  }
+
+  .mobile-card-table td[data-label="Approval Actions / Status"] {
+    min-width: 0 !important;
+  }
+
+  .mobile-card-table td[data-label="Approval Actions / Status"] .btn {
+    min-height: 38px;
+    min-width: 38px;
+  }
+}

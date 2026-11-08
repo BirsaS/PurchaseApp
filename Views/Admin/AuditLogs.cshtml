@@ -19,7 +19,7 @@
 </div>
 
 <div data-auto-refresh>
-<table class="table table-sm table-hover align-middle bg-white border">
+<table class="table table-sm table-hover align-middle bg-white border mobile-card-table">
     <thead class="table-dark">
         <tr>
             <th>Timestamp (UTC)</th>
@@ -33,11 +33,11 @@
         @foreach (var log in Model)
         {
             <tr class="@(log.Action == "API_Error" ? "table-danger" : "")">
-                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
-                <td>@(log.PurchaseRequestId.HasValue? log.PurchaseRequestId.ToString() : "-")</td>
-                <td><strong>@log.Action</strong></td>
-                <td>@log.PerformedBy</td>
-                <td>@log.Details</td>
+                <td data-label="Timestamp (UTC)">@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                <td data-label="Request ID">@(log.PurchaseRequestId.HasValue? log.PurchaseRequestId.ToString() : "-")</td>
+                <td data-label="Action"><strong>@log.Action</strong></td>
+                <td data-label="Performed By">@log.PerformedBy</td>
+                <td data-label="Details / API Error">@log.Details</td>
             </tr>
         }
     </tbody>
