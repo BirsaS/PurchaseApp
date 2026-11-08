@@ -1,0 +1,17 @@
+.vs/
+bin/
+obj/
+artifacts/
+TestResults/
+.idea/
+.vscode/
+*.user
+*.suo
+*.cache
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.Development.json
+Properties/launchSettings.json
+

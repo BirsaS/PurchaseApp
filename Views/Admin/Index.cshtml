@@ -1,0 +1,97 @@
+@model IEnumerable<PurchaseApp.Models.PurchaseRequest>
+
+@{
+    ViewData["Title"] = "Admin Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Admin - Purchase Requests Management</h2>
+
+    <div class="d-flex align-items-center gap-2">
+        <a asp-action="AuditLogs" class="btn btn-outline-secondary btn-sm">
+            View All Audit Records
+        </a>
+    </div>
+</div>
+
+<div id="adminTableContainer">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Title)</th>
+                <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                <th>@Html.DisplayNameFor(model => model.Department)</th>
+                <th>@Html.DisplayNameFor(model => model.ProposedSupplier)</th>
+                <th>@Html.DisplayNameFor(model => model.ApplicantName)</th>
+                <th>@Html.DisplayNameFor(model => model.Status)</th>
+                <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                <th>@Html.DisplayNameFor(model => model.PurchaseOrderNumber)</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
+                    <td>@item.Department</td>
+                    <td>@item.ProposedSupplier</td>
+                    <td>@item.ApplicantName</td>
+                    <td>
+                        <span class="badge request-status" data-status="@item.Status">@item.Status</span>
+                    </td>
+                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.PurchaseOrderNumber))
+                        {
+                            <span class="badge bg-info text-dark purchase-order-number">@item.PurchaseOrderNumber</span>
+                        }
+                        else if (!string.IsNullOrEmpty(item.ApiStatusMessage))
+                        {
+                            <span class="text-danger small">@item.ApiStatusMessage</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex gap-1 justify-content-end align-items-center">
+                            @if (item.Status == "Failed")
+                            {
+                                <form asp-action="RetryApi" asp-route-id="@item.Id" method="post" class="m-0">
+                                    <button type="submit" class="btn btn-sm btn-warning py-0 px-2 text-dark fw-bold">Retry API</button>
+                                </form>
+                            }
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to delete this request?');">
+                                <button type="submit" class="btn btn-sm btn-danger py-0 px-2">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    @if (Model.Any(r => r.Status == "Processing"))
+    {
+        <script>
+            setInterval(function () {
+                fetch(window.location.href)
+                    .then(response => response.text())
+                    .then(html => {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var newContainer = doc.getElementById('adminTableContainer');
+                        if (newContainer) {
+                            document.getElementById('adminTableContainer').innerHTML = newContainer.innerHTML;
+                        }
+                    });
+            }, 3000);
+        </script>
+    }
+}
+

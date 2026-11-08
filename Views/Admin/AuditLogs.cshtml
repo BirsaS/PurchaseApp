@@ -1,0 +1,43 @@
+﻿@model IEnumerable<PurchaseApp.Models.AuditLog>
+
+@{
+    ViewData["Title"] = "Audit Trail & System Logs";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Audit Trail & API Error Logs</h2>
+
+    <div class="d-flex align-items-center gap-2">
+        <a asp-action="Index" class="btn btn-secondary btn-sm">← Back to Admin Requests</a>
+
+        <form asp-action="DeleteAllAuditRecords" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to delete all audit records? This action cannot be undone.');">
+            <button type="submit" class="btn btn-danger btn-sm">
+                🗑️ Delete All Audit Records (Dev)
+            </button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-sm table-hover align-middle bg-white border">
+    <thead class="table-dark">
+        <tr>
+            <th>Timestamp (UTC)</th>
+            <th>Request ID</th>
+            <th>Action</th>
+            <th>Performed By</th>
+            <th>Details / API Error</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr class="@(log.Action == "API_Error" ? "table-danger" : "")">
+                <td>@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                <td>@(log.PurchaseRequestId.HasValue? log.PurchaseRequestId.ToString() : "-")</td>
+                <td><strong>@log.Action</strong></td>
+                <td>@log.PerformedBy</td>
+                <td>@log.Details</td>
+            </tr>
+        }
+    </tbody>
+</table>

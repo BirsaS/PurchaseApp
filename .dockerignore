@@ -1,0 +1,16 @@
+.git
+.vs
+bin
+obj
+artifacts
+*.user
+*.suo
+*.cache
+.idea
+.vscode
+.env
+.env.*
+!*.env.example
+secrets.json
+appsettings.Development.json
+Properties/launchSettings.json

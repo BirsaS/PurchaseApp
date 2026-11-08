@@ -1,0 +1,239 @@
+@model IEnumerable<PurchaseApp.Models.PurchaseRequest>
+
+@{
+    ViewData["Title"] = "Review Purchase Requests";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Review Purchase Requests</h2>
+
+    <div class="d-flex align-items-center gap-2">
+        <form asp-action="HideAllApproved" method="post" class="m-0">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                Hide all approved
+            </button>
+        </form>
+
+        <form asp-action="ResetAllRequests" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to reset all requests?');">
+            <button type="submit" class="btn btn-warning btn-sm">🔄 Reset Approvals (Dev)</button>
+        </form>
+    </div>
+</div>
+
+<div id="requestsTableContainer">
+    @if (Model.Any(r => r.Status == "Processing" && !string.IsNullOrEmpty(r.ApiStatusMessage)))
+    {
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <span class="spinner-border spinner-border-sm me-2 text-warning" role="status"></span>
+                <strong>Background Processing Notice:</strong>&nbsp;
+                @Model.First(r => r.Status == "Processing" && !string.IsNullOrEmpty(r.ApiStatusMessage)).ApiStatusMessage
+            </div>
+        </div>
+    }
+
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Title)</th>
+                <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                <th>@Html.DisplayNameFor(model => model.Department)</th>
+                <th>@Html.DisplayNameFor(model => model.ProposedSupplier)</th>
+                <th>@Html.DisplayNameFor(model => model.ApplicantName)</th>
+                <th>@Html.DisplayNameFor(model => model.Status)</th>
+                <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                <th>@Html.DisplayNameFor(model => model.PurchaseOrderNumber)</th>
+                <th class="text-end">Approval Actions / Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
+                    <td>@item.Department</td>
+                    <td>@item.ProposedSupplier</td>
+                    <td>@item.ApplicantName</td>
+                    <td>
+                        <span class="badge request-status" data-status="@item.Status">@item.Status</span>
+                        @if (!string.IsNullOrEmpty(item.RejectionReason))
+                        {
+                            <div class="text-danger small mt-1"><strong>Rejection Reason:</strong> @item.RejectionReason</div>
+                        }
+                    </td>
+                    <td>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.PurchaseOrderNumber))
+                        {
+                            <span class="badge bg-info text-dark purchase-order-number">@item.PurchaseOrderNumber</span>
+                        }
+                        else if (!string.IsNullOrEmpty(item.ApiStatusMessage))
+                        {
+                            <span class="text-danger small">@item.ApiStatusMessage</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+
+                    <td class="text-end" style="min-width: 220px;">
+                        <div class="d-flex flex-column gap-1">
+
+                            @if (item.Status == "Rejected")
+                            {
+                                <div class="d-flex flex-column gap-1">
+                                    <form asp-action="RevertToPending" asp-route-id="@item.Id" method="post" class="m-0">
+                                        <div class="input-group input-group-sm mb-1">
+                                            <select name="performedBy" class="form-select form-select-sm">
+                                                <option value="Department Head">Dept. Head</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Director">Director</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-warning btn-sm">Set to Pending</button>
+                                        </div>
+                                    </form>
+                                    <form asp-action="ForceApprove" asp-route-id="@item.Id" method="post" class="m-0">
+                                        <div class="input-group input-group-sm">
+                                            <select name="performedBy" class="form-select form-select-sm">
+                                                <option value="Department Head">Dept. Head</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Director">Director</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-success btn-sm">Approve Anyway</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-between align-items-center bg-white p-1 rounded border">
+                                    <span class="small fw-semibold text-secondary">Dept. Head</span>
+                                    <div>
+                                        @if (item.IsDepartmentHeadApproved)
+                                        {
+                                            <span class="badge bg-success">Approved</span>
+                                        }
+                                        else if (item.Status == "Pending Approval")
+                                        {
+                                            <form asp-action="ApproveDepartmentHead" asp-route-id="@item.Id" method="post" class="d-inline m-0">
+                                                <button type="submit" class="btn btn-success btn-sm py-0 px-1" title="Approve">✓</button>
+                                            </form>
+                                            <button type="button" class="btn btn-danger btn-sm py-0 px-1 ms-1" onclick="toggleRejectBox(@item.Id, 'Department Head')" title="Reject">✕</button>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Pending</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                @if (item.Amount > 500)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center bg-white p-1 rounded border">
+                                        <span class="small fw-semibold text-secondary">Finance</span>
+                                        <div>
+                                            @if (item.IsFinanceApproved)
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else if (item.Status == "Pending Approval")
+                                            {
+                                                <form asp-action="ApproveFinance" asp-route-id="@item.Id" method="post" class="d-inline m-0">
+                                                    <button type="submit" class="btn btn-success btn-sm py-0 px-1" title="Approve">✓</button>
+                                                </form>
+                                                <button type="button" class="btn btn-danger btn-sm py-0 px-1 ms-1" onclick="toggleRejectBox(@item.Id, 'Finance')" title="Reject">✕</button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Pending</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (item.Amount > 3000)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center bg-white p-1 rounded border">
+                                        <span class="small fw-semibold text-secondary">Director</span>
+                                        <div>
+                                            @if (item.IsDirectorApproved)
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else if (item.Status == "Pending Approval")
+                                            {
+                                                <form asp-action="ApproveDirector" asp-route-id="@item.Id" method="post" class="d-inline m-0">
+                                                    <button type="submit" class="btn btn-success btn-sm py-0 px-1" title="Approve">✓</button>
+                                                </form>
+                                                <button type="button" class="btn btn-danger btn-sm py-0 px-1 ms-1" onclick="toggleRejectBox(@item.Id, 'Director')" title="Reject">✕</button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Pending</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <div id="reject-box-@item.Id" style="display:none;" class="mt-2 p-2 border bg-light rounded text-start w-100 shadow-sm">
+                                <form asp-action="RejectRequest" method="post">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="rejectedBy" id="rejected-by-@item.Id" value="Approver" />
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold text-dark" id="reject-label-@item.Id">Rejection Reason:</label>
+                                        <textarea name="rejectionReason" class="form-control form-control-sm" required placeholder="Enter reason..."></textarea>
+                                    </div>
+                                    <div class="d-flex gap-1 justify-content-end">
+                                        <button type="submit" class="btn btn-dark btn-sm py-0 px-2">Confirm</button>
+                                        <button type="button" class="btn btn-secondary btn-sm py-0 px-2" onclick="toggleRejectBox(@item.Id)">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleRejectBox(id, roleName = 'Approver') {
+            var box = document.getElementById('reject-box-' + id);
+            var roleInput = document.getElementById('rejected-by-' + id);
+            var label = document.getElementById('reject-label-' + id);
+            if (roleInput) roleInput.value = roleName;
+            if (label) label.innerText = 'Rejection Reason (' + roleName + '):';
+
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+    </script>
+
+    @if (Model.Any(r => r.Status == "Processing"))
+    {
+        <script>
+            setInterval(function () {
+                fetch(window.location.href)
+                    .then(response => response.text())
+                    .then(html => {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var newTable = doc.getElementById('requestsTableContainer');
+                        if (newTable) {
+                            document.getElementById('requestsTableContainer').innerHTML = newTable.innerHTML;
+                        }
+                    });
+            }, 3000);
+        </script>
+    }
+}
+

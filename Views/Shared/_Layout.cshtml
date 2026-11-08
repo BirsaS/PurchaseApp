@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="sl-SI">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PurchaseApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-light">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-4">
+            <div class="container d-flex justify-content-between align-items-center">
+                <a class="navbar-brand fw-bold me-auto" asp-controller="PurchaseRequests" asp-action="Index">PurchaseApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center">
+                    @{
+                        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                    }
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link px-3 @(currentController == "PurchaseRequests" && currentAction == "Index" ? "active fw-bold text-white border-bottom border-light border-2" : "text-light")" asp-controller="PurchaseRequests" asp-action="Index">Purchase Requests</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 @(currentController == "PurchaseRequests" && currentAction == "Review" ? "active fw-bold text-white border-bottom border-light border-2" : "text-light")" asp-controller="PurchaseRequests" asp-action="Review">Review Requests</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 @(currentController == "Admin" ? "active fw-bold text-white border-bottom border-light border-2" : "text-light")" asp-controller="Admin" asp-action="Index">Admin Area</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-none d-sm-block" style="width: 120px;"></div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted mt-5 py-3 bg-white text-center">
+        <div class="container">
+            &copy; 2026 - PurchaseApp
+        </div>
+    </footer>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
