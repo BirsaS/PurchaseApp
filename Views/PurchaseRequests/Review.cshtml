@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div id="requestsTableContainer">
+<div id="requestsTableContainer" data-auto-refresh>
     @if (Model.Any(r => r.Status == "Processing" && !string.IsNullOrEmpty(r.ApiStatusMessage)))
     {
         <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-4" role="alert">
@@ -218,22 +218,5 @@
         }
     </script>
 
-    @if (Model.Any(r => r.Status == "Processing"))
-    {
-        <script>
-            setInterval(function () {
-                fetch(window.location.href)
-                    .then(response => response.text())
-                    .then(html => {
-                        var parser = new DOMParser();
-                        var doc = parser.parseFromString(html, 'text/html');
-                        var newTable = doc.getElementById('requestsTableContainer');
-                        if (newTable) {
-                            document.getElementById('requestsTableContainer').innerHTML = newTable.innerHTML;
-                        }
-                    });
-            }, 3000);
-        </script>
-    }
 }
 

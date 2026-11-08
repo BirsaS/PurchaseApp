@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sl-SI">
 <head>
     <meta charset="utf-8" />
@@ -48,6 +48,27 @@
     </footer>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        const autoRefreshContainers = document.querySelectorAll('[data-auto-refresh]');
+        if (autoRefreshContainers.length) {
+            setInterval(async () => {
+                if (document.activeElement.matches('input, textarea, select')) return;
+
+                try {
+                    const response = await fetch(window.location.href, { cache: 'no-store' });
+                    if (!response.ok) return;
+
+                    const documentParser = new DOMParser();
+                    const refreshedPage = documentParser.parseFromString(await response.text(), 'text/html');
+                    autoRefreshContainers.forEach(container => {
+                        const refreshedContainer = refreshedPage.querySelector(`[data-auto-refresh]${container.id ? `#${container.id}` : ''}`);
+                        if (refreshedContainer) container.innerHTML = refreshedContainer.innerHTML;
+                    });
+                } catch {
+                }
+            }, 5000);
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div id="adminTableContainer">
+<div id="adminTableContainer" data-auto-refresh>
     <table class="table table-striped table-hover align-middle">
         <thead>
             <tr>
@@ -75,23 +75,4 @@
     </table>
 </div>
 
-@section Scripts {
-    @if (Model.Any(r => r.Status == "Processing"))
-    {
-        <script>
-            setInterval(function () {
-                fetch(window.location.href)
-                    .then(response => response.text())
-                    .then(html => {
-                        var parser = new DOMParser();
-                        var doc = parser.parseFromString(html, 'text/html');
-                        var newContainer = doc.getElementById('adminTableContainer');
-                        if (newContainer) {
-                            document.getElementById('adminTableContainer').innerHTML = newContainer.innerHTML;
-                        }
-                    });
-            }, 3000);
-        </script>
-    }
-}
 
