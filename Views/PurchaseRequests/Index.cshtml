@@ -29,7 +29,7 @@
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
+                <td class="text-nowrap">@item.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("sl-SI"))</td>
                 <td>@Html.DisplayFor(modelItem => item.Department)</td>
                 <td>@Html.DisplayFor(modelItem => item.ProposedSupplier)</td>
                 <td>@Html.DisplayFor(modelItem => item.ApplicantName)</td>
